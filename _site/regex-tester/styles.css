@@ -1,0 +1,60 @@
+@layer base, components, utility;
+
+@layer base {
+    
+    *, *::before, *::after { box-sizing: border-box; }
+    
+    body {
+        font-family: system-ui, sans-serif;
+        line-height: 1.5;
+        color: #111;
+        background-color: #fefefe;
+    }
+    
+    h1, h2, h3, h4, h5, p {
+        margin-top: 0;
+        margin-bottom: .5em;
+    }
+    
+    a:not([class]) {
+        color: #0074D9;
+        text-decoration: none;
+        
+        &:where(:hover, :focus) {
+            text-decoration: underline;
+        }
+    }
+    
+    textarea {
+        width: 100%;
+    }
+    
+    hr {
+        border: 2px solid #ddd;
+        margin-block: 1.25rem;
+    }
+    
+}
+
+@layer components {
+    
+    .container {
+        max-width: 60ch;
+        margin-inline: auto;
+        padding: 1ch;
+    }
+    
+    .form-field {
+        display: grid;
+        grid-template-columns: 10ch auto;
+        margin-bottom: 1rem;
+    }
+    
+}
+
+@layer utility {
+    
+    .margin-after { margin-bottom: 1rem; }
+    
+}
+

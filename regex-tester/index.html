@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Regular Expression Tester</title>
+        <link rel="stylesheet" href="styles.css" />
+        <script type="module" src="script.js"></script>
+    </head>
+    <body>
+        <header class="container">
+            <h1>Regular Expression Tester</h1>
+            <p class="margin-after">
+                This tiny app lets you test <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp">regular expressions</a>.
+                Be sure to take a look at <a href="https://www.smashingmagazine.com/2024/08/history-future-regular-expressions-javascript/">this article</a> to see the latest features (as of writing).
+            </p>
+            
+            <div class="form-field">
+                <span>Regex</span>
+                <input name="regex-src" type="text">
+            </div>
+            <div class="form-field">
+                <span>Flags</span>
+                <input name="regex-flags" type="text">
+            </div>
+            <div>
+                <span>Regular Expression:</span>
+                <span 
+                      data-regex-compiled 
+                      role="img" 
+                      aria-label="regular expression not compiled">
+                    ❌
+                </span>
+            </div>
+        </header>
+        <main class="container">
+            <div class="form-field">
+                <span>Input</span>
+                <input name="input-src" type="text">
+            </div>
+            <hr>
+            
+            <p>Result</p>
+            <textarea id="exec-output" readonly rows="7"></textarea>
+            
+            <p>Match Groups</p>
+            <textarea id="groups-output" readonly rows="7"></textarea>
+        </main>
+        <footer class="container">
+            <hr>
+            <p>
+                Back to 
+                <a href="https://armornick.eu">homepage</a>
+            </p>
+        </footer>
+    </body>
+</html>

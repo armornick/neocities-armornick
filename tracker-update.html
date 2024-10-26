@@ -1,0 +1,41 @@
+---
+title: Making my Tracker progressively enhanced
+layout: base.njk
+---
+
+<h1>Making my Tracker progressively enhanced</h1>
+<p>In the old version of my tracker app, I had a terminal dependency on JavaScript. All of the data
+was defined inside a JSON file that was loaded at runtime to populate the page. While this does
+work fine, it means any error in loading the JavaScript means you just get a blank page.</p>
+<p>We should be able to do better.</p>
+<h2>Defining the data in HTML</h2>
+<p>HTML itself is actually a pretty good data definition language since all of the data will
+be human-readable just by virtue of being HTML. In addition, HTML5 allows you to add
+freeform <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*">data attributes</a>
+to your HTML which means we can select the data pretty easily using JavaScript.</p>
+<p>Thus, we could do something like this to define our data:</p>
+<pre><code>&lt;article data-item&gt;
+    &lt;h2 data-title&gt;Hello, World!&lt;/h2&gt;
+    &lt;p data-body&gt;
+        This is the body of the post.
+    &lt;/p&gt;
+&lt;/article&gt;
+</code></pre>
+<p>We can then read this structure using JavaScript to turn it into a data object:</p>
+<pre><code>const itemEl = document.querySelector('[data-item]');
+const data = {
+    title: itemEl.querySelector('[data-title]').textContent,
+    body: itemEl.querySelector('[data-body]').innerHTML,
+};
+</code></pre>
+<p>We can then use this data object for whatever purpose we need.</p>
+<p>For my tracker, I then cleared the element containing the data
+and hooked up a Svelte application. This is technically a bit wasteful
+but I didn't feel like rewriting my entire app right away.</p>
+<p>An alternate solution would have been to just add the sorting and filter
+buttons dynamically, like I did in <a href="https://codepen.io/armornick/pen/eYxxeGP">this CodePen example</a>.
+The two problems with this were that I didn't want rewrite my entire application,
+and I don't actually quite know how to reorder elements. (I might have to experiment with this.)</p>
+<p>All in all, I'm pretty satisfied with how it works. All of the source code can be found in
+<a href="https://github.com/armornick/my-tracker">this GitHub repository</a> for a more in-depth look
+at how it works.</p>

@@ -1,0 +1,257 @@
+---
+title: Using Tachyon's Design System
+layout: base.njk
+---
+
+<h1>Using Tachyon's Design System</h1>
+<p><a href="https://tachyons.io">Tachyons</a> is a pretty simple (build system-less) utility CSS library, and I quite
+like its design system. As far as I can tell, it has mostly &quot;lost&quot; against Tailwind and doesn't see too
+much use. However, that doesn't mean I can't still use it to demonstrate how we can use the design system
+of a utility library to make writing CSS simpler.</p>
+<p>The component we will be recreating is <a href="https://tachyons.io/components/banners/basic/index.html">the first banner component</a> on the <a href="https://tachyons.io/components/">Tachyons components page</a>. The HTML for the component is as follows:</p>
+<details>
+            <summary>Tachyons banner component</summary>
+            <div class="accordion-content">
+<pre><code>&lt;article class=&quot;mw7 center ph3 ph5-ns tc br2 pv5 bg-washed-green dark-green mb5&quot;&gt;
+  &lt;h1 class=&quot;fw6 f3 f2-ns lh-title mt0 mb3&quot;&gt;
+    This is a tagline. For x.
+  &lt;/h1&gt;
+  &lt;h2 class=&quot;fw2 f4 lh-copy mt0 mb3&quot;&gt;
+    This will change things. And we want you to be involved. This text needs to
+    be longer for testing sake.
+  &lt;/h2&gt;
+  &lt;p class=&quot;fw1 f5 mt0 mb3&quot;&gt;
+    Sign up for beta access or learn more about x.
+  &lt;/p&gt;
+  &lt;div&gt;
+    &lt;a class=&quot;f6 br-pill bg-dark-green no-underline washed-green ba b--dark-green grow pv2 ph3 dib mr3&quot;
+      href=&quot;#&quot;&gt;
+      Sign Up
+    &lt;/a&gt;
+    &lt;a class=&quot;f6 br-pill dark-green no-underline ba grow pv2 ph3 dib&quot;
+      href=&quot;#&quot;&gt;
+      Learn More
+    &lt;/a&gt;
+  &lt;/div&gt;
+&lt;/article&gt;
+</code></pre>
+<p></div>
+</details>
+<p>As you can see, it is not <em>that</em> unreadable but I still don't like every CSS property being its own class.
+To me, this defeats the point of using CSS which to some people is the point of using a utility library.
+I recommend reading <a href="https://joshcollinsworth.com/blog/tailwind-is-smart-steering">Josh Collinswirth's article on the matter</a>.</p>
+<p>Naming things is supposedly hard but of course we already know what this component is called: it's a <strong>banner</strong>.
+This is how I've changed the HTML:</p>
+<details>
+            <summary>Tachyons banner component (converted)</summary>
+            <div class="accordion-content">
+<pre><code>&lt;article class=&quot;banner&quot;&gt;
+  &lt;h1&gt;This is a tagline. For x.&lt;/h1&gt;
+  &lt;h2&gt;This will change things. And we want you to be involved. This text needs to be longer for testing sake.&lt;/h2&gt;
+  &lt;p&gt;Sign up for beta access or learn more about x.&lt;/p&gt;
+  &lt;div&gt;
+    &lt;a class=&quot;btn btn-filled&quot; href=&quot;#&quot;&gt;Sign Up&lt;/a&gt;
+    &lt;a class=&quot;btn&quot; href=&quot;#&quot;&gt;Learn More&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/article&gt;
+</code></pre>
+<p></div>
+</details>
+<p>Very minimalistic but I don't think every single part of a component should have its own class.
+Sibling and child selectors are part of CSS for a reason.</p>
+<p>To start implementing our component, we first have to extract the design system. This is basically the whole point
+of this write-up. After going through the Tachyons documentation, I've made the following CSS variables:</p>
+<details>
+            <summary>Tachyons design tokens as CSS variables</summary>
+            <div class="accordion-content">
+<pre><code>/* TACHYONS DESIGN TOKENS */
+/* sourced from https://tachyons.io/docs/ */
+:root {
+  /* TACHYONS COLORS */
+  --color-black: #000000;
+  --color-near-black: #111111;
+  --color-dark-gray: #333333;
+  --color-mid-gray: #555555;
+  --color-gray: #777777;
+  --color-silver: #999999;
+  --color-light-silver: #AAAAAA;
+  --color-moon-gray: #CCCCCC;
+  --color-light-gray: #EEEEEE;
+  --color-near-white: #F4F4F4;
+  --color-white: #FFFFFF;
+  --color-dark-red: #E7040F;
+  --color-red: #FF4136;
+  --color-light-red: #FF725C;
+  --color-orange: #FF6300;
+  --color-gold: #FFB700;
+  --color-yellow: #FFD700;
+  --color-light-yellow: #FBF1A9;
+  --color-purple: #5E2CA5;
+  --color-light-purple: #A463F2;
+  --color-dark-pink: #D5008F;
+  --color-hot-pink: #FF41B4;
+  --color-pink: #FF80CC;
+  --color-light-pink: #FFA3D7;
+  --color-dark-green: #137752;
+  --color-green: #19A974;
+  --color-light-green: #9EEBCF;
+  --color-navy: #001B44;
+  --color-dark-blue: #00449E;
+  --color-blue: #357EDD;
+  --color-light-blue: #96CCFF;
+  --color-lightest-blue: #CDECFF;
+  --color-washed-blue: #F6FFFE;
+  --color-washed-green: #E8FDF5;
+  --color-washed-yellow: #FFFCEB;
+  --color-washed-red: #FFDFDF
+  /* TACHYONS TYPE SCALE */
+  /* NOTE: why is it from large to small??? */
+  --font-headline: 6rem;
+  --font-subheadline: 5rem;
+  --font-size-1: 3rem;
+  --font-size-2: 2.25rem;
+  --font-size-3: 1.5rem;
+  --font-size-4: 1.25rem;
+  --font-size-5: 1rem;
+  --font-size-6: .875rem;
+  --font-size-7: .75rem;
+  /* TACHYONS LEADING (line-height) */
+  --leading-solid: 1;
+  --leading-title: 1.25;
+  --leading-copy: 1.5;
+  /* TACHYONS SPACING SCALE */
+  /* NOTE: variable names changed to be more concise */
+  --spacing-none: 0;
+  --spacing-xs: .25rem;
+  --spacing-sm: .5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 4rem;
+  --spacing-xxl: 8rem;
+  --spacing-xxxl: 16rem;
+  /* TACHYONS BOX SHADOW */
+  --shadow-1: 0px 0px 4px 2px rgba( 0, 0, 0, 0.2 );
+  --shadow-2: 0px 0px 8px 2px rgba( 0, 0, 0, 0.2 );
+  --shadow-3: 2px 2px 4px 2px rgba( 0, 0, 0, 0.2 );
+  --shadow-4: 2px 2px 8px 0px rgba( 0, 0, 0, 0.2 );
+  --shadow-5: 4px 4px 8px 0px rgba( 0, 0, 0, 0.2 );
+  /* TACHYONS BORDER RADIUS */
+  --radius-1: .125rem;
+  --radius-2: .25rem;
+  --radius-3: .5rem;
+  --radius-4: 1rem;
+  --radius-100: 100%;
+  --radius-pill: 9999px;
+  /* TACHYONS FONT FAMILIES */
+  --font-sans: -apple-system, BlinkMacSystemFont,
+               'avenir next', avenir,
+               'helvetica neue', helvetica,
+               ubuntu,
+               roboto, noto,
+               'segoe ui', arial,
+               sans-serif;
+  --font-serif: georgia,
+               times,
+               serif;
+  --font-mono: Consolas,
+               monaco,
+               monospace;
+}
+</code></pre>
+<p></div>
+</details>
+<p>I've made more variables than necessary for this example, but I've already extracted them in
+case I (or other people) want to use them in the future.</p>
+<p>Now we can start implementing our component. Basically, we just go through and turn every utility
+class back into a CSS property. For example: <code>bg-washed-green -&gt; background-color: var(--color-washed-green);</code>.
+In the case of Tachyons, each component also has the used utility classes on the page so it's extra easy.</p>
+<p>After converting every property, I've ended up with the following:</p>
+<details>
+            <summary>Tachyons banner component conversion</summary>
+            <div class="accordion-content">
+<pre><code>/* TACHYONS BANNER CSS */
+/* based on https://tachyons.io/components/banners/basic/index.html */
+
+.banner {
+  /* mw7 center ph3 ph5-ns tc br2 pv5 bg-washed-green dark-green mb5 */
+  max-width: 48rem;
+  margin-inline: auto;
+  padding-inline: var(--spacing-md);
+  text-align: center;
+  border-radius: var(--radius-2);
+  padding-block: var(--spacing-xl);
+  background-color: var(--color-washed-green);
+  color: var(--color-dark-green);
+}
+
+.banner &gt; h1 {
+  /* fw6 f3 f2-ns lh-title mt0 mb3 */
+  font-weight: 600;
+  font-size: var(--font-size-3);
+  line-height: var(--leading-title);
+  margin-block-start: 0;
+  margin-block-end: var(--spacing-md);
+}
+
+.banner &gt; h2 {
+  /* fw2 f4 lh-copy mt0 mb3 */
+  font-weight: 200;
+  font-size: var(--font-size-4);
+  line-height: var(--leading-copy);
+  margin-block-start: 0;
+  margin-block-end: var(--spacing-md);
+}
+
+.banner p {
+  /* fw1 f5 mt0 mb3 */
+  font-weight: 100;
+  font-size: var(--font-size-5);
+  margin-block-start: 0;
+  margin-block-end: var(--spacing-md);
+}
+
+.btn {
+  /* f6 br-pill dark-green no-underline ba grow pv2 ph3 dib */
+  font-size: var(--font-size-6);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  border-style: solid;
+  border-width: 1px;
+  padding-block: var(--spacing-sm);
+  padding-inline: var(--spacing-md);
+  display: inline-block;
+  background-color: var(--btn-bg-color, transparent);
+  color: var(--btn-color, var(--color-dark-green));
+  
+  transform: translateZ(0);
+  transition: transform 0.25s ease-out;
+}
+
+.btn:is(:hover, :focus) {
+  transform: scale(1.05);
+}
+
+.btn:is(:active) {
+  transform: scale(.90);
+}
+
+.btn-filled {
+  /* f6 br-pill bg-dark-green no-underline washed-green ba b--dark-green grow pv2 ph3 dib mr3 */
+  --btn-bg-color: var(--color-dark-green);
+  --btn-color: var(--color-washed-green);
+  border-color: var(--color-dark-green);
+}
+</code></pre>
+<p></div>
+</details>
+<p>Like I said before, the CSS is arguably more difficult than before in exchange for the HTML being much simpler.
+Which version is better will depend on whether you prefer working in CSS or HTML.</p>
+<p>I've also used child selectors like <code>.banner &gt; h2</code> because I don't think every single part of a component
+needs its own class. If needed, you can still use some utility classes (in combination with
+<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@layer">CSS layers</a> to avoid specificity problems) to give
+certain sub-components a specific look.</p>
+<p>This version of the code also has the benefit that CSS variables can be change dynamically so you can use localized
+CSS variables and switch the values in different themes or subcomponents. An example of this can be seen
+<a href="https://codepen.io/armornick/pen/ZEMGvOG">here</a>.</p>
+<p>The complete code for this &quot;article&quot; can be found <a href="https://codepen.io/armornick/pen/WNLWEyo">here</a>, along with some
+additional thoughts.</p>

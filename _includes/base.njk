@@ -1,0 +1,29 @@
+---
+title: armornick
+---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Eleventy v3.0.0">
+    <title>{{ title }}</title>
+    <link href="/chota.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/neo.css" rel="stylesheet" type="text/css" media="all">
+    {% if script %}<script type="module" src="./{{ script }}"></script>{% endif %}
+  </head>
+  <body>
+<nav class="nav top-nav container">
+  <div class="nav-left">
+    <a href="/" class="brand">armornick</a>
+  </div>
+  <div class="nav-right">
+    <a href="/tracker">Tracker</a>
+    <a href="https://www.tumblr.com/armornick">Tumblr</a>
+  </div>
+</nav>
+<main class="container {% if smallfonts %}smaller-fonts{% endif %}">
+{{ content | safe }}
+</main>
+  </body>
+</html>

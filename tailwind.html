@@ -1,0 +1,96 @@
+---
+title: My Thoughts on Tailwind
+layout: base.njk
+---
+
+<h1>My Thoughts on Tailwind</h1>
+<p>I am not very good at putting my thoughts into longer blog article form, so I am going to just write things like I would do on Twitter.</p>
+<p>Note that all of these are just my opinions and feel free to disregard any and all of them.</p>
+<hr>
+<p>I've been actually trying to use <a href="https://tailwindcss.com/">Tailwind</a> in some projects recently and while I initially liked it, I've actually come to dislike using it.</p>
+<p>I don't think it's a technically bad tool, but rather I believe that going all-in on utility classes actively makes your code worse. I've read Adam Wathan's <a href="https://adamwathan.me/css-utility-classes-and-separation-of-concerns/">rationale</a> that inspired Tailwind and I actually agree with a lot of the stuff in it, but I disagree with the conclusions.</p>
+<h2>The Horizontal Scroll</h2>
+<p>My first illustration on what I think is a problem with Tailwind can be illustrated by the following button from the <a href="https://flowbite.com/docs/components/buttons/">Flowbite component library</a>:</p>
+<pre><code>text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 
+</code></pre>
+<p>Now, let's compare a <a href="https://codepen.io/armornick/pen/VwEJjby">basic conversion</a> from Tailwind classes to CSS:</p>
+<pre><code>button {
+    border: none;
+    cursor: pointer;
+    color: white;
+    background-color: var(--tw-blue-700);
+    font-weight: var(--tw-font-medium);
+    border-radius: var(--tw-rounded-lg);
+    padding: var(--tw-size-2) var(--tw-size-5);
+}
+
+button:hover {
+    background-color: var(--tw-blue-800);
+}
+</code></pre>
+<p>The biggest thing that turns me off the Tailwind version is that at a certain point, you have to scroll through a long horizontal list of classes. And I only converted a subset of the actual Flowbite button. The more complex your component gets, the longer you will have to scroll through a list of classes that you have to mentally translate to CSS properties.</p>
+<p>In my opinion, the pure CSS version is a lot more readable because you can see everything vertically and you don't have to remember what every class does. I've also used custom properties (my favorite CSS feature) to more easily choose what values to use. In short, it's all of the advantages of Tailwind without any of the drawbacks.</p>
+<h2>Better Utility Classes</h2>
+<p>I'm not outright saying utility classes are bad, though. But you want components of the same type to look the same on your project, so I think it's a better approach to start by creating basic component classes (like 'button' or 'alert') and then use utility classes to create smaller variations.</p>
+<p>There is more to it than just creating a one-to-one property to utility class conversion, though. If you have a <code>bg-dark-blue</code> utility class, I'd say it should also set the text color because when would you ever want to have a dark blue background <em>without</em> a lighter text color? And if you really need a different text color, you can add a separate class in the specific cases where you want it. But if you go the Tailwind route, you have to remember to add <code>text-light</code> whenever you use your <code>bg-dark-blue</code>.</p>
+<p>The people who seem to treat Tailwind as their religion will say &quot;you can easily do the same thing using <code>@apply</code>&quot;. They are <em>technically</em> right. However, not only does the <a href="https://tailwindcss.com/docs/reusing-styles#avoiding-premature-abstraction">Tailwind documentation explicitly discourage you</a>, it also defeats the point of using Tailwind in the first place. You might as well just write CSS.</p>
+<p>Don't forget that Tailwind adds an additional build tool to your development process. This is not much of a problem in itself, since we use a bunch of build tools all the time nowadays, but it's still something to keep in consideration. If you use pure CSS, you could just put your CSS file on any webserver and it will just work.</p>
+<h2>On Naming Things</h2>
+<p>Another big argument that people use to 'advertise' Tailwind is that you don't have to name things. This is the one argument that absolutely infuriates me in several ways. The first and biggest flaw with the argument is that you have to name things even when you use Tailwind. Unless you put your entire app in a single HTML file, you are going to have to extract a component <em>that you have to name</em>. If you have a <code>Button</code> component, you can add a <code>button</code> class.</p>
+<p>If you genuinely don't know what to name something, do you even know what you're making? I understand naming things can be hard, but that's not a good reason to just throw away semantics altogether. And if you <em>really</em> don't know what to call something, just use a random word as a placeholder until you think of something.</p>
+<hr>
+<p><span class="update">update on 2023-06-18</span></p>
+<h2>Tailwind with Components</h2>
+<p>After playing around with Tailwind a bit more, I may have found a better way to use Tailwind than utility-only. Using either <code>@apply</code> or by writing plugins, we can create old-school component classes (like <code>.btn</code>). These components are placed in a components layer internally so we can still use all of the base Tailwind utility classes to override anything.</p>
+<p>Taking a look at the various component libraries, there are actually quite a few of them that work exactly this way. In particular, <a href="https://daisyui.com/">DaisyUI</a>, the self-proclaimed most popular Tailwind component library, uses this way of working and even makes the same points as me about the endless lists of utility classes.</p>
+<p>Making a component plugin in Tailwind is fairly simple: you just use <a href="https://tailwindcss.com/docs/plugins#adding-components"><code>addComponents</code> function</a> with a class and the default properties you want to use. I have some example code below that shows how to create a simple button component with color variants.</p>
+<details>
+            <summary>Example component plugin</summary>
+            <div class="accordion-content">
+<pre><code>import plugin from &quot;tailwindcss/plugin&quot;;
+const DEFAULT_COLORS = [ 'blue', 'green', 'red' ];
+
+/* inline-block rounded border border-indigo-600 bg-indigo-600 px-12 py-3 text-sm font-medium text-white hover:bg-transparent hover:text-indigo-600 focus:outline-none focus:ring active:text-indigo-500 */
+const getButtonStyles = (colors, theme) =&gt; ({
+    '.btn': {
+        display: 'inline-block',
+        borderRadius: theme('borderRadius.DEFAULT'),
+        border: `1px solid var(--button-border, ${theme('colors.neutral.600')})`,
+        backgroundColor: `var(--button-background, ${theme('colors.neutral.600')})`,
+        padding: `${theme('spacing.3')} ${theme('spacing.12')}`,
+        fontSize: theme('fontSize.sm'),
+        fontWeight: theme('fontWeight.medium'),
+        color: `var(--button-text, ${theme('colors.white')})`,
+
+        '&amp;:hover': {
+            backgroundColor: 'transparent',
+            color: `var(--button-text-hover, ${theme('colors.neutral.600')})`,
+        },
+
+        '&amp;:active': {
+            color: `var(--button-text-active, ${theme('colors.neutral.500')})`,
+        },
+    },
+
+    ...colors.map(color =&gt; ({
+        [`.btn-${color}`]: {
+            '--button-border': theme(`colors.${color}.600`),
+            '--button-background': theme(`colors.${color}.600`),
+            '--button-text-hover': theme(`colors.${color}.600`),
+            '--button-text-active': theme(`colors.${color}.500`),
+        }
+    }))
+});
+
+export const buttons = plugin.withOptions((options = { colors: DEFAULT_COLORS }) =&gt; {
+    return ({ addComponents, theme }) =&gt; {
+        const { colors } = options;
+        addComponents(getButtonStyles(colors, theme));
+    };
+});
+</code></pre>
+<p></div>
+</details>
+<p>The same thing is also possible using <code>@apply</code>, although you lose the power of being able to use javascript. In my earlier writing, I was against using <code>@apply</code> because it went &quot;against the spirit of Tailwind&quot; and I didn't know for sure that it was always going to be around. My opinion on this has changed because I recently found <a href="https://twitter.com/mzrnsh/status/1483481045802655751">confirmation on Twitter by the official developer that <code>@apply</code> will stay around</a>. I'm also not a huge fan of framework developers telling users how they can use their tools, so everyone should feel free to use <code>@apply</code> as much as they want.</p>
+<h2>Tailwind for Prototyping</h2>
+<p>Everything else I've said aside, I <em>do</em> think the absolute best way to use Tailwind is for prototyping. Even if you rewrite all of your styles using vanilla CSS (or anything else), it is really fun and powerful to be able to quickly create a website just by adding classes. In long term projects I still think going utility-only is a very bad idea, but being able to quickly test things using Tailwind is very handy.</p>

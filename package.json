@@ -1,0 +1,13 @@
+{
+  "name": "neocities-armornick",
+  "scripts": {
+    "build": "npx @11ty/eleventy",
+    "start": "npx @11ty/eleventy --serve"
+  },
+  "author": "armornick",
+  "license": "BSD0",
+  "type": "module",
+  "dependencies": {
+    "@11ty/eleventy": "^3.0.0"
+  }
+}
